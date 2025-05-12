@@ -1,5 +1,6 @@
 name: Playwright Tests
 on:
+  workflow_dispatch:
   push:
     branches: [ main, master ]
   pull_request:
@@ -13,12 +14,25 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+
     - name: Install dependencies
       run: npm ci
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
+    - name: Configure Datadog Test Optimization
+      uses: datadog/test-visibility-github-action@v2
+      with:
+        languages: js
+        api_key: ${{ secrets.DD_API_KEY }}
+        site: datadoghq.com # Change if your site is not US1
+      
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+        NODE_OPTIONS: -r ${{ env.DD_TRACE_PACKAGE }}
+
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
