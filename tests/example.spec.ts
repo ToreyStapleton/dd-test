@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import moment from 'moment';
 
 test('has title', async ({ page }) => {
+  moment.locale('en');
   await page.goto('https://playwright.dev/');
 
   // Expect a title "to contain" a substring.
